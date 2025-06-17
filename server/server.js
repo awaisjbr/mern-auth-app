@@ -17,6 +17,10 @@ app.use(cors({
 }))
 app.use("/api/auth", authRouter);
 
+app.get("/", (req, res) => {
+    res.send("Hello MERN Auth App")
+})
+
 const port = process.env.PORT || 5000;
 connectDB()
 .then(() => {
