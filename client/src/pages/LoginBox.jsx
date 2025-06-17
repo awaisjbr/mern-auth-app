@@ -7,6 +7,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 // import { TailSpin } from "react-loader-spinner";
 import { useAuthStore } from '../zustand/useAuthStore';
 import { Loader } from 'lucide-react';
+import Loading from '../components/Loading';
 
 
 const LoginBox = () => {
@@ -71,20 +72,7 @@ const LoginBox = () => {
         </div>
         <h3 className='text-sm'>{loginState === "Login" ? "Don't have an account?" : "Already have an account?"} <NavLink onClick={() => loginState === "Login" ? setLoginState("Signup") : setLoginState("Login")} className="text-lg hover:underline">{loginState === "Login" ? "Sign Up" : "Sign In"}</NavLink></h3>
       </div>
-      {loading && (
-        <div className='h-screen flex items-center justify-center absolute top-0 left-0' style={{background:"rgba(0,0,0,0.7)", zIndex:"1"}}>
-        <Loader
-          // visible={true}
-          // height="180"
-          // width="180"
-          // color="#5549c9"
-          // ariaLabel="tail-spin-loading"
-          // radius="1"
-          // wrapperStyle={{}}
-          // wrapperClass=""
-        />
-      </div>
-      )}
+      {loading && <Loading />}
     </div>
   )
 }
