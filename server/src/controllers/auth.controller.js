@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import validator from "validator"
 import cloudinary from "../config/cloudinary.js";
 import corn from "node-cron";
