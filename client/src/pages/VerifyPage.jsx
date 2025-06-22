@@ -2,18 +2,26 @@ import React, { useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../components/ui/input-otp";
 import { useAuthStore } from "../zustand/useAuthStore";
 import Loading from "../components/Loading";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const VerifyPage = () => {
   const {verifyEmail, loading} = useAuthStore()
-    const [verificationOTP, setVerificationOTP] = useState("");
+  const navigate = useNavigate()
+  const [verificationOTP, setVerificationOTP] = useState("");
     
-    const handleVerifyEmail = async (e) => {
-        e.preventDefault();
-        verifyEmail(verificationOTP);
-    }
+  const handleVerifyEmail = async (e) => {
+      e.preventDefault();
+      try {
+        await verifyEmail(verificationOTP);
+        navigate('/login')
+      } catch (error) {
+        toast.error(error.message)
+      }
+  }
 
   return (
-    <div className='bg-[url("./assets/bg.png")] bg-center bg-cover w-screen h-screen relative flex items-center justify-center'>
+    <div className='bg-[url("https://res.cloudinary.com/dofovybxu/image/upload/v1740456299/auth_ecmjrt.jpg")] bg-center bg-cover w-screen h-screen relative flex items-center justify-center'>
       <div className="bg-white/30 backdrop-blur-sm max-w-[360px] w-full h-[50%] flex items-center flex-col py-5 justify-evenly">
         <h1 className="flex items-center gap-3 text-xl font-semibold">Email-Verification</h1>
         
@@ -32,6 +40,7 @@ const VerifyPage = () => {
         </form>
 
       </div>
+      {loading && <Loading />}
     </div>
   );
 };

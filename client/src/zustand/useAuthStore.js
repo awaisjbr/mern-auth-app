@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import {create} from "zustand";
 import {AxiosInstance} from "../utils/AxiosInstance"
+import { useNavigate } from "react-router-dom";
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -13,7 +14,7 @@ export const useAuthStore = create((set, get) => ({
         try {
             const {data} = await AxiosInstance.get("/auth/check-auth");
             if(data.success){
-                set({authUser: data.user, isAuthenticated: true})
+                set({authUser: data.user, isAuthenticated: true, isCheckingAuth:false})
             }else {
                 set({ user: null, isAuthenticated: false });
               }
@@ -86,6 +87,40 @@ export const useAuthStore = create((set, get) => ({
             }
         } catch (error) {
             toast.error(error?.response?.data?.message || "Logout Failed");
+            set({loading:false})
+        }
+    },
+
+    forgotPassword: async (email) => {
+        set({loading: true})
+        try {
+            const{data} = await AxiosInstance.post("/auth/forgot-password", {email});
+            if(data.success){
+                toast.success(data.message);
+                set({user:null, isAuthenticated:false, loading:false});
+            }else{
+                toast.error(data.message);
+                set({ loading: false})
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Reset Password Failed");
+            set({loading:false})
+        }
+    },
+
+    resetPassword: async (code, password) => {
+        set({loading: true})
+        try {
+            const {data} = await AxiosInstance.post(`/auth/reset-password/${code}`, {password});
+            if(data.success){
+                toast.success(data.message);
+                set({loading:false, isAuthenticated: false, authUser: null})
+            }else{
+                toast.error(data.message);
+                set({ loading: false})
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Reset Password Failed");
             set({loading:false})
         }
     }

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import validator from "validator"
 import cloudinary from "../config/cloudinary.js";
 import corn from "node-cron";
+import crypto from "crypto";
 import { userModel } from "../models/user.model.js";
 import { transporter } from "../config/nodemailer.js";
 import { generateTokenAndCookies } from "../utils/utils.js";
@@ -164,5 +165,58 @@ export const updateProfilePic = async (req, res) => {
     } catch (error) {
         res.status(500).json({success: false, message: error.message});
         console.log(error)
+    }
+}
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const {email} = req.body;
+        if(!email){
+            return res.json({success:false, message: "Email is required"})
+        };
+        const user = await userModel.findOne({email}).select("-password");
+        if(!user){
+            return res.json({success:false, message: "Email not found"})
+        }
+        const verificationOTP = crypto.randomBytes(32).toString("hex");
+        const verificationOtpExpiresAt = Date.now() + (10 * 60 * 1000) ;  //OTP valid for 10 minutes
+        const resetUrl = `http://localhost:5173/reset-password/${verificationOTP}`
+        user.verificationOTP = verificationOTP;
+        user.verificationOtpExpiresAt = verificationOtpExpiresAt;
+        await user.save();
+        
+        const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to : "awaisjbr@gmail.com",
+        subject: "Password Reset Link",
+        text: `Welcome! your requested password reset link for email ${email} is <a target="_blank" href=${resetUrl} style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>. It is valid for 10 minutes. `
+        }
+
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({success: true, message: "Password Forgot OTP sent to email"})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success: false, message: error.message}) 
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    const {password} = req.body;
+    const {code} = req.params;
+    try {
+        const user = await userModel.findOne({verificationOTP: code});
+        if(!user || user.verificationOtpExpiresAt < Date.now()){
+            return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+        }
+        const hasedPassword = await bcrypt.hash(password, 10);
+        user.password = hasedPassword;
+        user.verificationOTP = undefined;
+        user.verificationOtpExpiresAt = undefined;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password reset successful" });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success: false, message: error.message}) 
     }
 }
