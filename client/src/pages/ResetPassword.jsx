@@ -35,7 +35,7 @@ const ResetPassword = () => {
                 <h1 className='text-center font-bold text-xl'>Reset Password</h1>
             </div>
             <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
-                <div><input className='p-1 rounded-sm outline-none' type="password" name='password' value={password} onChange={(e) => setPassword(e.target.value)} placeholder='password'/></div>
+                <div><input className='p-1 rounded-sm outline-none' type="password" name='password' value={password} onChange={(e) => setPassword(e.target.value)} placeholder='new password'/></div>
                 <div><input className='p-1 rounded-sm outline-none' type="password" name='confirmPassword' value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder='confirm password'/></div>
                 <button className='text-lg bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-md cursor-pointer font-semibold' type="submit">Reset Password</button>
             </form>

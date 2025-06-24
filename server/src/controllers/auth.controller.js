@@ -44,7 +44,7 @@ export const registerUser = async (req, res) => {
     const verificationOTP = Math.floor(Math.random() * 900000 + 100000).toString();
     const verificationOtpExpiresAt = Date.now() + 10 * 60 * 1000   //OTP valid for 10 minutes
     const newUser = new userModel({userName, email, password:hasedPassword, verificationOTP, verificationOtpExpiresAt});
-    newUser.profilePic = `https://avatar.iran.liara.run/public/boy?username=${newUser.userName}`
+    newUser.profilePic = `https://res.cloudinary.com/dofovybxu/image/upload/v1750736205/avatar_dwursb.png`
     await newUser.save();
 
     const mailOptions = {
@@ -156,9 +156,13 @@ export const updateProfilePic = async (req, res) => {
         if(!user){
             return res.status(500).json({success: false, message: "user not authorized"});
         }
+        if(user.profilePicPublicId){
+            await cloudinary.uploader.destroy(user.profilePicPublicId)
+        }
         const profilePic = req.file;
         const profilePicURL = await cloudinary.uploader.upload(profilePic.path, {resource_type: "image"});
         user.profilePic = profilePicURL.secure_url;
+        user.profilePicPublicId = profilePicURL.public_id;
         await user.save();
 
         res.status(200).json({success: true, message: "Profile Pic updated successfully"});

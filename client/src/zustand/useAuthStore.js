@@ -123,6 +123,23 @@ export const useAuthStore = create((set, get) => ({
             toast.error(error?.response?.data?.message || "Reset Password Failed");
             set({loading:false})
         }
+    },
+
+    updateProfilePic: async (avatarPic) => {
+        set({loading: true})
+        try {
+            const {data} = await AxiosInstance.post("/auth/update-profile-pic",avatarPic);
+            if(data.success){
+                set({loading:false})
+                toast.success(data.message);
+            }else{
+                toast.error(data.message);
+                set({ loading: false})
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Reset Password Failed");
+            set({loading:false})
+        }
     }
     
 }))
