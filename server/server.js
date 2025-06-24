@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json({limit: "5mb"}));
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://mern-ecommerce-backend-iota.vercel.app','http://localhost:5173'],
+    origin: ['https://mern-authentication-app-virid.vercel.app','http://localhost:5173'],
     credentials: true
 }))
 app.use("/api/auth", authRouter);
