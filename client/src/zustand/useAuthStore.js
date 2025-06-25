@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import {create} from "zustand";
 import {AxiosInstance} from "../utils/AxiosInstance"
-import { useNavigate } from "react-router-dom";
+import { googleAuth } from "../utils/GoogleApi";
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -137,7 +137,24 @@ export const useAuthStore = create((set, get) => ({
                 set({ loading: false})
             }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Reset Password Failed");
+            toast.error(error?.response?.data?.message || "Profile pic updation Failed");
+            set({loading:false})
+        }
+    },
+
+    googleSignIn: async (code) => {
+        set({loading: true})
+        try {
+            const {data} = await AxiosInstance.get(`/auth/google?code=${code}`);
+            if(data.success){
+                set({loading: false, authUser:data.user, isAuthenticated: true})
+                toast.success(data.message)
+            }else{
+                set({loading: false})
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Google Login Failed");
             set({loading:false})
         }
     }

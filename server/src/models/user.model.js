@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
         minlength: 6,
         // select: false
     },
+    isOAuth: { 
+        type: Boolean, 
+        default: false 
+    },
     isVerified: {
         type: Boolean,
         default: false

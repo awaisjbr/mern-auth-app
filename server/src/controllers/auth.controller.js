@@ -6,6 +6,8 @@ import crypto from "crypto";
 import { userModel } from "../models/user.model.js";
 import { transporter } from "../config/nodemailer.js";
 import { generateTokenAndCookies } from "../utils/utils.js";
+import { oauth2client } from "../config/googleLoginConfig.js";
+import axios from "axios"
 
 
 corn.schedule("0 */12 * * *", async () => {
@@ -101,6 +103,9 @@ export const loginUser = async (req, res) => {
         if(!user){
             return res.status(500).json({success: false, message: "invalid Email"})
         }
+        if (user.isOAuth) {
+            return res.status(500).json({success:false, message: "Please log in with Google." });
+}
         const isMatchPsssword = await bcrypt.compare(password, user.password);
         if(!isMatchPsssword){
             return res.status(500).json({success: false, message: "Wrong password"})
@@ -219,6 +224,42 @@ export const resetPassword = async (req, res) => {
         await user.save();
 
         res.status(200).json({ success: true, message: "Password reset successful" });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success: false, message: error.message}) 
+    }
+}
+
+export const googleLogin = async (req, res) => {
+    const {code} = req.query;
+
+    try {
+        const {tokens} = await oauth2client.getToken(code);
+        oauth2client.setCredentials(tokens);
+        const {data} = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokens.access_token}`)
+        const {email, name, picture} = data;
+        const pictureURL = await cloudinary.uploader.upload(picture, {resource_type: "image"})
+
+        let user = await userModel.findOne({email}).select("-password");
+        if(!user){
+            user = new userModel({
+                email,
+                userName: name,
+                password:null,
+                isVerified: true,
+                profilePic: pictureURL.secure_url,
+                profilePicPublicId: pictureURL.public_id,
+                lastLoggedIn: new Date(),
+                isOAuth: true
+            })
+            await user.save();
+        }else {
+            user.lastLoggedIn = new Date();
+            await user.save();
+        };
+        generateTokenAndCookies(user._id, res);
+
+        res.json({success: true, message: "User loggedIn via google", user})
     } catch (error) {
         console.log(error)
         res.status(500).json({success: false, message: error.message}) 

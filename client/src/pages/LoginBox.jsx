@@ -1,15 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { FaForumbee } from "react-icons/fa6";
+import React, { useEffect, useState } from 'react';
 import { LuEyeClosed } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
-import { FcGoogle } from "react-icons/fc";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { IoFingerPrint } from "react-icons/io5";
-// import { TailSpin } from "react-loader-spinner";
 import { useAuthStore } from '../zustand/useAuthStore';
-import { Loader } from 'lucide-react';
 import Loading from '../components/Loading';
 import toast from 'react-hot-toast';
+import GoogleLogin from '../components/GoogleLogin';
 
 
 const LoginBox = () => {
@@ -75,9 +72,9 @@ const LoginBox = () => {
                     <NavLink to={"/forgot-password"} className="text-sm hover:underline">Forgot Password</NavLink>
                 </div>
                 <button type='submit' className='bg-[rgb(85,73,201)] text-white w-full py-1 my-1 rounded-sm'>{loginState === "Login" ? "Sign In" : "Register"}</button>
-                {loginState === "Login"? <button className='flex items-center gap-2 bg-white py-1 px-2 rounded-lg mx-auto'><FcGoogle className='text-xl' />Sign In with google</button>: null}
             </form>
         </div>
+         {loginState === "Login"? <GoogleLogin /> : null}
         <h3 className='text-sm'>{loginState === "Login" ? "Don't have an account?" : "Already have an account?"} <NavLink onClick={() => loginState === "Login" ? setLoginState("Signup") : setLoginState("Login")} className="text-lg hover:underline">{loginState === "Login" ? "Sign Up" : "Sign In"}</NavLink></h3>
       </div>
       {loading && <Loading />}
