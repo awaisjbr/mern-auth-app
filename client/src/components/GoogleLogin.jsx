@@ -1,9 +1,7 @@
 import React from 'react';
 import {useGoogleLogin} from "@react-oauth/google"
 import { FcGoogle } from 'react-icons/fc';
-import { googleAuth } from '../utils/GoogleApi';
 import { useAuthStore } from '../zustand/useAuthStore';
-import Loading from './Loading';
 
 const GoogleLogin = () => {
     const {googleSignIn, loading} = useAuthStore()
@@ -19,9 +17,9 @@ const GoogleLogin = () => {
     };
 
     const googleLogin = useGoogleLogin({
-        onSuccess: responseGoogle, // Pass the actual callback here
+        onSuccess: responseGoogle, 
         onError: (error) => console.log('Login Failed:', error),
-        flow: 'auth-code', // use 'implicit' if you're not exchanging on backend
+        flow: 'auth-code',
     });
 
   return (

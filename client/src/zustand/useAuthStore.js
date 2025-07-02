@@ -103,7 +103,7 @@ export const useAuthStore = create((set, get) => ({
                 set({ loading: false})
             }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Reset Password Failed");
+            toast.error(error?.response?.data?.message || "Forgot Password Failed");
             set({loading:false})
         }
     },

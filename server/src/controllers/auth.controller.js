@@ -238,10 +238,10 @@ export const googleLogin = async (req, res) => {
         oauth2client.setCredentials(tokens);
         const {data} = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokens.access_token}`)
         const {email, name, picture} = data;
-        const pictureURL = await cloudinary.uploader.upload(picture, {resource_type: "image"})
-
+        
         let user = await userModel.findOne({email}).select("-password");
         if(!user){
+            const pictureURL = await cloudinary.uploader.upload(picture, {resource_type: "image"})
             user = new userModel({
                 email,
                 userName: name,
